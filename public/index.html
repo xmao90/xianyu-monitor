@@ -364,6 +364,32 @@
   <div id="tab-settings" class="tab-content" style="display:none">
     <div class="settings-panel">
       <div class="settings-group">
+        <h3>🍪 闲鱼登录凭证</h3>
+        <div style="background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:12px">
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px">
+            为了获取真实闲鱼数据，需要设置登录凭证<br>
+            <span style="color:var(--yellow)">⚠️ 闲鱼 Cookie 是你登录闲鱼后的身份凭证</span>
+          </div>
+          <textarea id="setting-xianyu-cookies" placeholder="粘贴从闲鱼网页复制的 Cookie..." 
+            style="width:100%;height:80px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:12px;outline:none;resize:vertical;font-family:monospace"></textarea>
+          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+            <button class="btn btn-primary btn-sm" onclick="saveXianyuCookies()">💾 保存凭证</button>
+            <button class="btn btn-sm" onclick="testConnection()">🔗 测试连接</button>
+            <span id="conn-status" style="font-size:12px;color:var(--text2)"></span>
+          </div>
+          <div style="margin-top:10px;font-size:12px;color:var(--text2);background:var(--bg);padding:10px;border-radius:6px">
+            <b>获取 Cookie 方法：</b><br>
+            1. 电脑浏览器打开 <b>market.xianyu.com</b><br>
+            2. 登录闲鱼账号<br>
+            3. 按 <b>F12</b> 打开开发者工具<br>
+            4. 切换到 <b>Network（网络）</b> 标签<br>
+            5. 刷新页面，点击任意请求<br>
+            6. 在 <b>Request Headers</b> 里找到 <b>Cookie:</b> 字段<br>
+            7. 复制整个 Cookie 值粘贴到上方
+          </div>
+        </div>
+      </div>
+      <div class="settings-group">
         <h3>🔔 通知设置</h3>
         <div class="setting-row">
           <div>
@@ -813,6 +839,64 @@ async function quickSearch() {
   }
 }
 
+// ==================== 闲鱼 Cookie 设置 ====================
+async function saveXianyuCookies() {
+  const cookies = document.getElementById('setting-xianyu-cookies').value.trim();
+  try {
+    const data = await api('/api/settings/cookies', {
+      method: 'POST',
+      body: JSON.stringify({ cookies })
+    });
+    showToast(data.message || '保存成功', data.success ? 'success' : 'error');
+  } catch(e) { showToast('保存失败: ' + e.message, 'error'); }
+}
+
+async function testConnection() {
+  const btn = event.target;
+  const status = document.getElementById('conn-status');
+  btn.disabled = true;
+  btn.textContent = '测试中...';
+  status.textContent = '';
+  
+  try {
+    const data = await api('/api/test-connection');
+    if (data.success) {
+      status.textContent = `✅ 连接成功！找到 ${data.itemCount} 个商品 (${data.source})`;
+      status.style.color = 'var(--green)';
+      showToast('连接成功，数据源: ' + data.source, 'success');
+    } else {
+      status.textContent = '❌ 连接失败: ' + data.error;
+      status.style.color = 'var(--red)';
+      showToast('连接失败: ' + data.error, 'error');
+    }
+  } catch(e) {
+    status.textContent = '❌ 网络错误';
+    status.style.color = 'var(--red)';
+    showToast('网络错误', 'error');
+  }
+  
+  btn.disabled = false;
+  btn.textContent = '🔗 测试连接';
+}
+
+// 页面加载时获取当前设置
+async function loadSettings() {
+  try {
+    const settings = await api('/api/settings');
+    document.getElementById('setting-interval').value = settings.scan_interval || '30';
+    if (settings.auto_scan === 'true') {
+      document.getElementById('toggle-auto-scan').classList.add('on');
+    } else {
+      document.getElementById('toggle-auto-scan').classList.remove('on');
+    }
+    if (settings.notify_sound === 'true') {
+      document.getElementById('toggle-notify-sound').classList.add('on');
+    } else {
+      document.getElementById('toggle-notify-sound').classList.remove('on');
+    }
+  } catch(e) { console.error(e); }
+}
+
 // ==================== 设置 ====================
 async function toggleSetting(key, el) {
   el.classList.toggle('on');
@@ -877,6 +961,7 @@ function switchTab(tab) {
   if (tab === 'items') loadItems(selectedKeywordId);
   else if (tab === 'favorites') loadFavorites();
   else if (tab === 'keywords') loadKeywords();
+  else if (tab === 'settings') loadSettings();
 }
 
 // ==================== 工具函数 ====================
