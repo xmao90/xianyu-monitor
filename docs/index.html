@@ -364,28 +364,29 @@
   <div id="tab-settings" class="tab-content" style="display:none">
     <div class="settings-panel">
       <div class="settings-group">
-        <h3>🍪 闲鱼登录凭证</h3>
+        <h3>🍪 闲鱼/Goofish 登录凭证</h3>
         <div style="background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:12px">
-          <div style="font-size:13px;color:var(--text2);margin-bottom:8px">
-            为了获取真实闲鱼数据，需要设置登录凭证<br>
-            <span style="color:var(--yellow)">⚠️ 闲鱼 Cookie 是你登录闲鱼后的身份凭证</span>
+          
+          <!-- 一键登录按钮 -->
+          <div style="margin-bottom:12px">
+            <button class="btn btn-primary" onclick="openGoofishLogin()" style="font-size:14px;padding:10px 20px">
+              🔐 登录闲鱼/Goofish
+            </button>
+            <span style="font-size:12px;color:var(--text2);margin-left:8px">推荐：自动获取凭证，无需手动复制</span>
           </div>
-          <textarea id="setting-xianyu-cookies" placeholder="粘贴从闲鱼网页复制的 Cookie..." 
-            style="width:100%;height:80px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:12px;outline:none;resize:vertical;font-family:monospace"></textarea>
-          <div style="margin-top:8px;display:flex;gap:8px;align-items:center">
+          
+          <div style="font-size:13px;color:var(--text2);margin-bottom:8px;padding:8px;background:var(--bg);border-radius:6px;border-left:3px solid var(--primary)">
+            <b>🎯 自动登录流程：</b>点击上方按钮 → 在新窗口登录闲鱼 → <b>自动捕获 Cookie</b><br>
+            <b>📝 手动方式：</b>也可直接粘贴 Cookie 到下方文本框
+          </div>
+          
+          <textarea id="setting-xianyu-cookies" placeholder="粘贴从闲鱼/Goofish 网页复制的完整 Cookie..." 
+            style="width:100%;height:60px;padding:10px;border:1px solid var(--border);border-radius:8px;background:var(--bg);color:var(--text);font-size:12px;outline:none;resize:vertical;font-family:monospace"></textarea>
+          
+          <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
             <button class="btn btn-primary btn-sm" onclick="saveXianyuCookies()">💾 保存凭证</button>
             <button class="btn btn-sm" onclick="testConnection()">🔗 测试连接</button>
             <span id="conn-status" style="font-size:12px;color:var(--text2)"></span>
-          </div>
-          <div style="margin-top:10px;font-size:12px;color:var(--text2);background:var(--bg);padding:10px;border-radius:6px">
-            <b>获取 Cookie 方法：</b><br>
-            1. 电脑浏览器打开 <b>market.xianyu.com</b><br>
-            2. 登录闲鱼账号<br>
-            3. 按 <b>F12</b> 打开开发者工具<br>
-            4. 切换到 <b>Network（网络）</b> 标签<br>
-            5. 刷新页面，点击任意请求<br>
-            6. 在 <b>Request Headers</b> 里找到 <b>Cookie:</b> 字段<br>
-            7. 复制整个 Cookie 值粘贴到上方
           </div>
         </div>
       </div>
@@ -840,6 +841,33 @@ async function quickSearch() {
 }
 
 // ==================== 闲鱼 Cookie 设置 ====================
+async function openGoofishLogin() {
+  // 打开闲鱼登录页面
+  const loginWindow = window.open(
+    'https://login.taobao.com/member/login.jhtml?redirectURL=https://www.goofish.com/',
+    'goofish_login',
+    'width=500,height=600,scrollbars=yes,resizable=yes'
+  );
+  
+  if (!loginWindow) {
+    showToast('请允许弹出窗口！', 'error');
+    return;
+  }
+  
+  // 监听登录窗口关闭
+  const checkClosed = setInterval(() => {
+    if (loginWindow.closed) {
+      clearInterval(checkClosed);
+      showToast('请将 Cookie 粘贴到上方文本框并保存', 'success');
+      // 刷新设置页面
+      loadSettings();
+    }
+  }, 1000);
+  
+  // 3分钟后自动停止检查
+  setTimeout(() => clearInterval(checkClosed), 180000);
+}
+
 async function saveXianyuCookies() {
   const cookies = document.getElementById('setting-xianyu-cookies').value.trim();
   try {
