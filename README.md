@@ -10,32 +10,33 @@
 - 🔔 **声音提醒** - 发现新商品时播放提示音
 - 📱 **响应式设计** - 支持手机和电脑访问
 
+## 一键部署到 Render（免费）
 
-## 快速部署
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/xmao90/xianyu-monitor)
 
-### 方式一：Railway 部署（推荐，免费）
+部署步骤：
+1. 点击上方按钮，进入 Render
+2. 用 GitHub 账号登录
+3. 点击 **"New Web Service"**
+4. 确保选择了 `xianyu-monitor` 仓库
+5. 设置：
+   - **Name**: `xianyu-monitor`
+   - **Region**: Singapore（新加坡节点，速度快）
+   - **Branch**: `main`
+   - **Build Command**: `npm install`
+   - **Start Command**: `npm start`
+   - **Plan**: Free
+6. 点击 **"Create Web Service"** 等待部署完成
+7. 部署成功后，复制 Render 给你的域名
 
-1. 打开 [railway.app](https://railway.app)，用 GitHub 登录
-2. 点击 **New Project** → **Deploy from GitHub repo** → 选择 `xmao90/xianyu-monitor`
-3. Railway 会自动检测 Node.js 项目并部署
-4. 部署完成后，访问 Railway 提供的域名即可
-
-> Railway 免费额度：每月 500 小时，足够个人使用
-
-### 方式二：本地运行
+## 本地运行
 
 ```bash
+git clone https://github.com/xmao90/xianyu-monitor
 cd xianyu-monitor
 npm install
 npm start
 # 访问 http://localhost:3000
-```
-
-### 方式三：Docker 部署
-
-```bash
-docker build -t xianyu-monitor .
-docker run -d -p 3000:3000 xianyu-monitor
 ```
 
 ## 登录信息
@@ -45,16 +46,11 @@ docker run -d -p 3000:3000 xianyu-monitor
 
 > ⚠️ 首次登录后请立即修改密码！
 
-## 域名绑定
-
-部署到 Railway 后，可以将自定义域名绑定到你的 Railway 项目：
-- Railway Dashboard → 项目 → Settings → Networking → Add Domain
-
 ## 技术栈
 
 - **后端**: Node.js + Express
 - **前端**: 纯 HTML/CSS/JS（无框架）
-- **数据存储**: JSON 文件（SQLite 兼容）
+- **数据存储**: JSON 文件
 
 ## 免责声明
 

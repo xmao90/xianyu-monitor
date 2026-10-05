@@ -1,0 +1,27 @@
+name: Deploy to Render
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Deploy to Render
+        run: |
+          curl -X POST "https://api.render.com/v1/blueprints" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "repo": "https://github.com/xmao90/xianyu-monitor",
+              "branch": "main",
+              "name": "xianyu-monitor",
+              "region": "singapore",
+              "plan": "free",
+              "buildCommand": "npm install",
+              "startCommand": "npm start",
+              "healthCheckPath": "/api/health"
+            }'
