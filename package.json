@@ -1,7 +1,7 @@
 {
   "name": "xianyu-monitor",
-  "version": "1.0.0",
-  "description": "闲鱼上新监控 - 网页版",
+  "version": "1.1.0",
+  "description": "闲鱼上新监控 - 网页版 v1.1",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
