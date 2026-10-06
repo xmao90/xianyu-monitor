@@ -1,9 +1,9 @@
-{
-  "name": "xianyu-monitor",
-  "region": "singapore",
-  "plan": "free",
-  "buildCommand": "npm install",
-  "startCommand": "npm start",
-  "healthCheckPath": "/api/health",
-  "envVars": []
-}
+services:
+  - type: web
+    name: xianyu-monitor
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
